@@ -15,7 +15,7 @@ import java.util.Map;
 @Entity
 public class Orders {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ordersId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,9 +27,9 @@ public class Orders {
     @MapKeyColumn(name = "drinks_id")
     @Column(name = "qty")
     private Map<Long, Integer> drinksMap = new HashMap<>();
-//    @ManyToMany
-//    @JoinTable(name = "orders_drinks_map",
-//            joinColumns = @JoinColumn(name = "orders_id"),
+
+//    @OneToMany
+//    @JoinTable(name = "orders_drinks_map", joinColumns = @JoinColumn(name = "orders_id"),
 //            inverseJoinColumns = @JoinColumn(name = "drinks_id"))
 //    @MapKeyJoinColumn(name = "drinks_id")
 //    @Column(name = "qty")
@@ -49,7 +49,9 @@ public class Orders {
 
         return order;
     }
-//    public static Orders of(Customer customer, Map<Long, Integer> drinksMap, int status){
-//            return new Orders(null, customer, drinksMap, status);
-//    }
+    public void update(List<DrinkQtyDto> drinksList){
+        for (DrinkQtyDto drinkQty : drinksList) {
+            drinksMap.put(drinkQty.getDrinksId(), drinkQty.getQty());
+        }
+    }
 }
