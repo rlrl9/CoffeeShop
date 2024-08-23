@@ -4,6 +4,8 @@ import com.example.CoffeeShop.entity.Customer;
 import com.example.CoffeeShop.entity.Orders;
 import lombok.*;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -12,8 +14,8 @@ import java.util.Map;
 @Builder
 public class RequestOrdersDto {
     private Long customerId;
-    private Map<Long, Integer> drinksList;
-
+    private List<DrinkQtyDto> drinksList;
+//    private Map<Long, Integer> drinksList;
     public Orders toEntity(Customer customer){
         return Orders.of(
                 customer,
@@ -21,6 +23,13 @@ public class RequestOrdersDto {
                 1
         );
     }
+//    public Orders toEntity(Customer customer){
+//        return Orders.of(
+//                customer,
+//                drinksList,
+//                1
+//        );
+//    }
 //    public Order toEntity(){
 //        return Order.of(
 //                null,

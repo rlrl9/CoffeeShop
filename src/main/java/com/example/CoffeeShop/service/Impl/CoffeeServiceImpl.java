@@ -10,6 +10,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -22,6 +24,6 @@ public class CoffeeServiceImpl implements CoffeeService {
         Customer customer = customerRepository.findByCustomerId(requestOrdersDto.getCustomerId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
         Orders orders = ordersRepository.save(requestOrdersDto.toEntity(customer));
-        return ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId()).orElse(null);
+        return ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId());
     }
 }
