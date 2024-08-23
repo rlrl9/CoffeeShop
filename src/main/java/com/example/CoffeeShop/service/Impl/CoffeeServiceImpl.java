@@ -1,10 +1,13 @@
 package com.example.CoffeeShop.service.Impl;
 
 import com.example.CoffeeShop.dto.request.RequestOrdersDto;
+import com.example.CoffeeShop.dto.response.ResponsePaymentDto;
 import com.example.CoffeeShop.entity.Customer;
 import com.example.CoffeeShop.entity.Orders;
+import com.example.CoffeeShop.entity.Payment;
 import com.example.CoffeeShop.repository.CustomerRepository;
 import com.example.CoffeeShop.repository.OrdersRepository;
+import com.example.CoffeeShop.repository.PaymentRepository;
 import com.example.CoffeeShop.service.CoffeeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ import java.util.List;
 public class CoffeeServiceImpl implements CoffeeService {
     private final OrdersRepository ordersRepository;
     private final CustomerRepository customerRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public Orders insertOrder(RequestOrdersDto requestOrdersDto){
@@ -33,10 +37,12 @@ public class CoffeeServiceImpl implements CoffeeService {
         return ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId()).get();
     }
 
-//    @Override
-//    public Orders payForOrder(Long customerId){
-//        Orders orders = ordersRepository.findByCustomer_CustomerId(customerId)
-//                .orElseThrow(()->new IllegalArgumentException("해당 주문 건이 존재하지 않습니다."));
-//
-//    }
+    @Override
+    public ResponsePaymentDto payForOrder(Long customerId){
+        Orders orders = ordersRepository.findByCustomer_CustomerId(customerId)
+                .orElseThrow(()->new IllegalArgumentException("해당 주문 건이 존재하지 않습니다."));
+        Payment payment = paymentRepository.save(Payment.of(orders));
+        orders.updateAfterPayment();
+        return ResponsePaymentDto.from(payment);
+    }
 }

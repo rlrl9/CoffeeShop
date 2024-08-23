@@ -54,4 +54,8 @@ public class Orders {
             drinksMap.put(drinkQty.getDrinksId(), drinkQty.getQty());
         }
     }
+    public void updateAfterPayment(){
+//        drinksMap.clear();
+        status = 2;
+    }
 }

@@ -17,11 +17,11 @@ public class CoffeeController {
     public ResponseEntity<?> insertOrder(@RequestBody RequestOrdersDto requestOrdersDto) {
         return ResponseEntity.status(HttpStatus.OK).body(coffeeService.insertOrder(requestOrdersDto));
     }
-//    //음료 결제
-//    @GetMapping
-//    public ResponseEntity<?> payForOrder(@RequestParam Long customerId) {
-//        return ResponseEntity.status(HttpStatus.OK).body(coffeeService.payForOrder(customerId));
-//    }
+    //음료 결제
+    @GetMapping
+    public ResponseEntity<?> payForOrder(@RequestParam(name = "id") Long customerId) {
+        return ResponseEntity.status(HttpStatus.OK).body(coffeeService.payForOrder(customerId));
+    }
     //음료 가져감
 
 }
