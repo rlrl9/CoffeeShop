@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CoffeeService {
     Orders insertOrder(RequestOrdersDto requestOrdersDto);
+//    Orders payForOrder(Long customerId);
 }

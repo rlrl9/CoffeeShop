@@ -23,7 +23,20 @@ public class CoffeeServiceImpl implements CoffeeService {
     public Orders insertOrder(RequestOrdersDto requestOrdersDto){
         Customer customer = customerRepository.findByCustomerId(requestOrdersDto.getCustomerId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
-        Orders orders = ordersRepository.save(requestOrdersDto.toEntity(customer));
-        return ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId());
+        if(ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId()).isPresent()){
+            Orders orders = ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId()).get();
+            orders.update(requestOrdersDto.getDrinksList());
+        }else{
+            Orders orders = ordersRepository.save(requestOrdersDto.toEntity(customer));
+        }
+
+        return ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId()).get();
     }
+
+//    @Override
+//    public Orders payForOrder(Long customerId){
+//        Orders orders = ordersRepository.findByCustomer_CustomerId(customerId)
+//                .orElseThrow(()->new IllegalArgumentException("해당 주문 건이 존재하지 않습니다."));
+//
+//    }
 }
