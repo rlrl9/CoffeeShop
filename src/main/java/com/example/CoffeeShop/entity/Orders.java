@@ -38,8 +38,9 @@ public class Orders {
     //0:취소 1:대기 2:완료 3:배송완료
     private int status;
 
-    public static Orders of(Customer customer, List<DrinkQtyDto> drinksList, int status){
+    public static Orders of(Long ordersId, Customer customer, List<DrinkQtyDto> drinksList, int status){
         Orders order = new Orders();
+        order.ordersId = ordersId;
         order.customer = customer;
         order.status = status;
 
@@ -57,5 +58,9 @@ public class Orders {
     public void updateAfterPayment(){
 //        drinksMap.clear();
         status = 2;
+    }
+    public void updateAfterTakeout(){
+//        drinksMap.clear();
+        status = 3;
     }
 }

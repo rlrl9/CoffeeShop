@@ -23,5 +23,8 @@ public class CoffeeController {
         return ResponseEntity.status(HttpStatus.OK).body(coffeeService.payForOrder(customerId));
     }
     //음료 가져감
-
+    @GetMapping("/takeout")
+    public ResponseEntity<?> takeoutMenu(@RequestParam(name = "id") Long customerId) {
+        return ResponseEntity.status(HttpStatus.OK).body(coffeeService.takeoutMenu(customerId));
+    }
 }
