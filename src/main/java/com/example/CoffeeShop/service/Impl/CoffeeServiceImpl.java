@@ -38,7 +38,7 @@ public class CoffeeServiceImpl implements CoffeeService {
         }else{ //주문해놓은 메뉴가 없을 경우
             //아예 orders 에 아무데이터도 없을 경우 1로 초기화
             Long ordersId = ordersRepository.findMaxId() != null ? ordersRepository.findMaxId() + 1 : 1L;
-            orders = ordersRepository.save(requestOrdersDto.toEntity(ordersId+1,customer));
+            orders = ordersRepository.save(requestOrdersDto.toEntity(ordersId,customer));
         }
         for (DrinkQtyDto drinkQty : requestOrdersDto.getDrinksList()) {
             Drinks drinks = drinksRepository.findByDrinksId(drinkQty.getDrinksId())
@@ -49,7 +49,7 @@ public class CoffeeServiceImpl implements CoffeeService {
             totPrice += drinkQty.getQty()*drinksRepository.findByDrinksId(drinkQty.getDrinksId()).get().getPrice();
             orders.setTotPrice(totPrice);
         }
-        return ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
+        return orders;
     }
     /**
      * 주문 결제
