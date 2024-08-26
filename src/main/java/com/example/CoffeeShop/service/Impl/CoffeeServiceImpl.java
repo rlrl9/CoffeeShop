@@ -1,19 +1,15 @@
 package com.example.CoffeeShop.service.Impl;
 
+import com.example.CoffeeShop.dto.request.DrinkQtyDto;
 import com.example.CoffeeShop.dto.request.RequestOrdersDto;
 import com.example.CoffeeShop.dto.response.ResponseOrdersDto;
 import com.example.CoffeeShop.dto.response.ResponsePaymentDto;
-import com.example.CoffeeShop.entity.Customer;
-import com.example.CoffeeShop.entity.Orders;
-import com.example.CoffeeShop.entity.Payment;
-import com.example.CoffeeShop.repository.CustomerRepository;
-import com.example.CoffeeShop.repository.OrdersRepository;
-import com.example.CoffeeShop.repository.PaymentRepository;
+import com.example.CoffeeShop.entity.*;
+import com.example.CoffeeShop.repository.*;
 import com.example.CoffeeShop.service.CoffeeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +18,8 @@ public class CoffeeServiceImpl implements CoffeeService {
     private final OrdersRepository ordersRepository;
     private final CustomerRepository customerRepository;
     private final PaymentRepository paymentRepository;
+    private final DrinksRepository drinksRepository;
+    private final OrdersDrinksRepository ordersDrinksRepository;
     /**
      * 메뉴 주문
      * @param requestOrdersDto
@@ -34,7 +32,14 @@ public class CoffeeServiceImpl implements CoffeeService {
         //주문해놓은 메뉴가 있을 경우
         if(ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).isPresent()){
             Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
-            orders.update(requestOrdersDto.getDrinksList());
+            orders.clearOrdersDrinks();
+            for (DrinkQtyDto drinkQty : requestOrdersDto.getDrinksList()) {
+                Drinks drinks = drinksRepository.findByDrinksId(drinkQty.getDrinksId())
+                        .orElseThrow(() -> new IllegalArgumentException("음료가 존재하지 않습니다 : " + drinkQty.getDrinksId()));
+                OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty());
+                ordersDrinksRepository.save(ordersDrinks);
+                orders.addOrdersDrinks(ordersDrinks);
+            }
         }else{ //주문해놓은 메뉴가 없을 경우
             Long ordersId;
             if(ordersRepository.findMaxId()==null){ // orders 테이블에 아무 것도 없을 경우
@@ -42,7 +47,14 @@ public class CoffeeServiceImpl implements CoffeeService {
             }else{
                 ordersId = ordersRepository.findMaxId();
             }
-            ordersRepository.save(requestOrdersDto.toEntity(ordersId+1,customer));
+            Orders ordersSave = ordersRepository.save(requestOrdersDto.toEntity(ordersId+1,customer));
+            for (DrinkQtyDto drinkQty : requestOrdersDto.getDrinksList()) {
+                Drinks drinks = drinksRepository.findByDrinksId(drinkQty.getDrinksId())
+                        .orElseThrow(() -> new IllegalArgumentException("음료가 존재하지 않습니다 : " + drinkQty.getDrinksId()));
+                OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty());
+                ordersDrinksRepository.save(ordersDrinks);
+                ordersSave.addOrdersDrinks(ordersDrinks);
+            }
         }
 
         return ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
@@ -67,8 +79,6 @@ public class CoffeeServiceImpl implements CoffeeService {
      */
     @Override
     public ResponseOrdersDto takeoutMenu(Long customerId){
-//        Payment payment = paymentRepository.findByOrders_Customer_CustomerId(customerId)
-//                .orElseThrow(()->new IllegalArgumentException("해당 결제 건이 존재하지 않습니다."));
         Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(customerId,2)
                 .orElseThrow(()->new IllegalArgumentException("해당 주문 건이 존재하지 않습니다."));
         ResponseOrdersDto responseOrdersDto = ResponseOrdersDto.from(orders);

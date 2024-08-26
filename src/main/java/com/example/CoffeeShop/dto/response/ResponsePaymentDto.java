@@ -1,9 +1,10 @@
 package com.example.CoffeeShop.dto.response;
 
+import com.example.CoffeeShop.entity.OrdersDrinks;
 import com.example.CoffeeShop.entity.Payment;
 import lombok.*;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * 결제 응답 받기 위한 dto
@@ -16,7 +17,7 @@ public class ResponsePaymentDto {
 
     private Long customerId; // 고객 id
 
-    private Map<Long, Integer> drinksMap; // 음료 list
+    private List<OrdersDrinks> drinksMap; // 음료 list
 
     private boolean status; // 결제 성공/실패 상태 (false: 실패, true: 성공)
 
@@ -25,7 +26,7 @@ public class ResponsePaymentDto {
     public static ResponsePaymentDto from(Payment payment){
         return ResponsePaymentDto.builder()
                 .customerId(payment.getOrders().getCustomer().getCustomerId())
-                .drinksMap(payment.getOrders().getDrinksMap())
+                .drinksMap(payment.getOrders().getOrdersDrinksList())
                 .status(payment.isStatus())
                 .paymentType(payment.getPaymentType())
                 .build();

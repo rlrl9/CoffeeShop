@@ -1,9 +1,10 @@
 package com.example.CoffeeShop.dto.response;
 
 import com.example.CoffeeShop.entity.Orders;
+import com.example.CoffeeShop.entity.OrdersDrinks;
 import lombok.*;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * 주문 응답 받기 위한 dto
@@ -15,14 +16,14 @@ import java.util.Map;
 public class ResponseOrdersDto {
     private Long customerId; // 고객 id
 
-    private Map<Long, Integer> drinksMap; // 음료 목록
+    private List<OrdersDrinks> drinksMap; // 음료 목록
 
     private String statusMessage; // 상태 메세지
 
     public static ResponseOrdersDto from(Orders orders){
         return ResponseOrdersDto.builder()
                 .customerId(orders.getCustomer().getCustomerId())
-                .drinksMap(orders.getDrinksMap())
+                .drinksMap(orders.getOrdersDrinksList())
                 .statusMessage("테이크 아웃 했습니다.")
                 .build();
     }
