@@ -22,7 +22,7 @@ public class Orders {
     @JoinColumn(name="customer_id")
     private Customer customer; // 고객 정보
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name="orders_id")
     private List<OrdersDrinks> ordersDrinksList = new ArrayList<>();
 
