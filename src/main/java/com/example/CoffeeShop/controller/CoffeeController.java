@@ -22,8 +22,8 @@ public class CoffeeController {
     }
     //음료 결제
     @GetMapping
-    public ResponseEntity<?> payForOrder(@RequestParam(name = "id") Long customerId) {
-        return ResponseEntity.status(HttpStatus.OK).body(coffeeService.payForOrder(customerId));
+    public ResponseEntity<?> payForOrder(@RequestParam(name = "id") Long customerId,@RequestParam(name = "type") int paymentType) {
+        return ResponseEntity.status(HttpStatus.OK).body(coffeeService.payForOrder(customerId,paymentType));
     }
     //음료 테이크아웃
     @GetMapping("/takeout")

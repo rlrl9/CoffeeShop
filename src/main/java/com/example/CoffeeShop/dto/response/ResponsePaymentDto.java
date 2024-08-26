@@ -20,11 +20,14 @@ public class ResponsePaymentDto {
 
     private boolean status; // 결제 성공/실패 상태 (false: 실패, true: 성공)
 
+    private int paymentType; // 결제 수단(0: 현금, 1: 카드, 2: 상품권)
+
     public static ResponsePaymentDto from(Payment payment){
         return ResponsePaymentDto.builder()
                 .customerId(payment.getOrders().getCustomer().getCustomerId())
                 .drinksMap(payment.getOrders().getDrinksMap())
                 .status(payment.isStatus())
+                .paymentType(payment.getPaymentType())
                 .build();
     }
 }
