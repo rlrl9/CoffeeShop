@@ -16,24 +16,12 @@ public class RequestOrdersDto {
     private Long customerId;
     private List<DrinkQtyDto> drinksList;
 //    private Map<Long, Integer> drinksList;
-    public Orders toEntity(Customer customer){
+    public Orders toEntity(Long ordersId,Customer customer){
         return Orders.of(
+                ordersId,
                 customer,
                 drinksList,
                 1
         );
     }
-//    public Orders toEntity(Customer customer){
-//        return Orders.of(
-//                customer,
-//                drinksList,
-//                1
-//        );
-//    }
-//    public Order toEntity(){
-//        return Order.of(
-//                null,
-//                0
-//        );
-//    }
 }
