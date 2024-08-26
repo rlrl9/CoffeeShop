@@ -1,10 +1,7 @@
 package com.example.CoffeeShop.entity;
 
-import com.example.CoffeeShop.dto.request.DrinkQtyDto;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -14,13 +11,13 @@ import java.util.List;
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paymentId;
+    private Long paymentId; // 결제 id
 
     @OneToOne
     @JoinColumn(name = "orders_id")
-    private Orders orders;
+    private Orders orders; // 주문 정보
 
-    private boolean status;
+    private boolean status; // 상태 (false: 결제 실패, true: 결제 성공)
 
     public static Payment of(Orders orders){
         Payment payment = new Payment();

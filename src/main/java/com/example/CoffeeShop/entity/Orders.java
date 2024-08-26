@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 주문 정보
+ */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
@@ -15,28 +18,19 @@ import java.util.Map;
 @Entity
 public class Orders {
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ordersId;
+    private Long ordersId; // 주문 id
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="customer_id")
-    private Customer customer;
+    private Customer customer; // 고객 정보
 
     @ElementCollection
     @CollectionTable(name = "orders_drinks_map", joinColumns = @JoinColumn(name = "orders_id"))
     @MapKeyColumn(name = "drinks_id")
     @Column(name = "qty")
-    private Map<Long, Integer> drinksMap = new HashMap<>();
-
-//    @OneToMany
-//    @JoinTable(name = "orders_drinks_map", joinColumns = @JoinColumn(name = "orders_id"),
-//            inverseJoinColumns = @JoinColumn(name = "drinks_id"))
-//    @MapKeyJoinColumn(name = "drinks_id")
-//    @Column(name = "qty")
-//    private Map<Drinks, Integer> drinksMap = new HashMap<>();
-
-    //0:취소 1:대기 2:완료 3:배송완료
-    private int status;
+    private Map<Long, Integer> drinksMap = new HashMap<>(); // 주문 음료 리스트 map
+    
+    private int status; // 주문 상태 (0:취소 1:결제 대기 2:결제 완료 3:테이크아웃 완료)
 
     public static Orders of(Long ordersId, Customer customer, List<DrinkQtyDto> drinksList, int status){
         Orders order = new Orders();
@@ -50,17 +44,18 @@ public class Orders {
 
         return order;
     }
+    // 주문 음료 리스트 수정
     public void update(List<DrinkQtyDto> drinksList){
         for (DrinkQtyDto drinkQty : drinksList) {
             drinksMap.put(drinkQty.getDrinksId(), drinkQty.getQty());
         }
     }
+    // 주문 완료 상태로 업데이트
     public void updateAfterPayment(){
-//        drinksMap.clear();
         status = 2;
     }
+    // 테이크아웃 완료 상태로 업데이트
     public void updateAfterTakeout(){
-//        drinksMap.clear();
         status = 3;
     }
 }
