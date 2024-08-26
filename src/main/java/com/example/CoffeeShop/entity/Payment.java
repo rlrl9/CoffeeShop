@@ -3,6 +3,9 @@ package com.example.CoffeeShop.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * 결제 정보
+ */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString

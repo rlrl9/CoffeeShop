@@ -20,8 +20,8 @@ public class RequestOrdersDto {
         return Orders.of(
                 ordersId,
                 customer,
-                drinksList,
-                1
+                1,
+                null
         );
     }
 }
