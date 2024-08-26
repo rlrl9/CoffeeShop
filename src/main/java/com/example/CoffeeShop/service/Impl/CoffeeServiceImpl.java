@@ -29,6 +29,7 @@ public class CoffeeServiceImpl implements CoffeeService {
     public Orders insertOrder(RequestOrdersDto requestOrdersDto){
         Customer customer = customerRepository.findByCustomerId(requestOrdersDto.getCustomerId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+        long totPrice = (long) 0;
         //주문해놓은 메뉴가 있을 경우
         if(ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).isPresent()){
             Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
@@ -39,6 +40,8 @@ public class CoffeeServiceImpl implements CoffeeService {
                 OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty());
                 ordersDrinksRepository.save(ordersDrinks);
                 orders.addOrdersDrinks(ordersDrinks);
+                totPrice += drinkQty.getQty()*drinksRepository.findByDrinksId(drinkQty.getDrinksId()).get().getPrice();
+                orders.setTotPrice(totPrice);
             }
         }else{ //주문해놓은 메뉴가 없을 경우
             Long ordersId;
@@ -54,9 +57,10 @@ public class CoffeeServiceImpl implements CoffeeService {
                 OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty());
                 ordersDrinksRepository.save(ordersDrinks);
                 ordersSave.addOrdersDrinks(ordersDrinks);
+                totPrice += drinkQty.getQty()*drinksRepository.findByDrinksId(drinkQty.getDrinksId()).get().getPrice();
+                ordersSave.setTotPrice(totPrice);
             }
         }
-
         return ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
     }
     /**

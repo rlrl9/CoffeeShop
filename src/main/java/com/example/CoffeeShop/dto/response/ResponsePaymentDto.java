@@ -23,12 +23,15 @@ public class ResponsePaymentDto {
 
     private int paymentType; // 결제 수단(0: 현금, 1: 카드, 2: 상품권)
 
+    private Long totPrice; // 총 금액
+
     public static ResponsePaymentDto from(Payment payment){
         return ResponsePaymentDto.builder()
                 .customerId(payment.getOrders().getCustomer().getCustomerId())
                 .drinksMap(payment.getOrders().getOrdersDrinksList())
                 .status(payment.isStatus())
                 .paymentType(payment.getPaymentType())
+                .totPrice(payment.getOrders().getTotPrice())
                 .build();
     }
 }
