@@ -6,6 +6,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
+/**
+ * 음료 정보
+ */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
@@ -14,11 +17,11 @@ import lombok.*;
 public class Drinks {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long drinksId;
+    private Long drinksId; // 음료 id
 
-    private String drinksName;
+    private String drinksName; // 음료 이름
 
-    private Long price;
+    private Long price; // 음료 가격
 
-    private int categoryNo;
+    private int categoryNo; // 카테고리
 }

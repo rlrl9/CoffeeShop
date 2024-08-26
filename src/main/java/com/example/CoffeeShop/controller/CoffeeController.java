@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 메뉴 주문 컨트롤러
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/coffee")
@@ -22,7 +25,7 @@ public class CoffeeController {
     public ResponseEntity<?> payForOrder(@RequestParam(name = "id") Long customerId) {
         return ResponseEntity.status(HttpStatus.OK).body(coffeeService.payForOrder(customerId));
     }
-    //음료 가져감
+    //음료 테이크아웃
     @GetMapping("/takeout")
     public ResponseEntity<?> takeoutMenu(@RequestParam(name = "id") Long customerId) {
         return ResponseEntity.status(HttpStatus.OK).body(coffeeService.takeoutMenu(customerId));
