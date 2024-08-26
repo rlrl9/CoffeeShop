@@ -12,5 +12,5 @@ import lombok.*;
 @Setter
 public class DrinkQtyDto {
     private Long drinksId; //음료 id
-    private Integer qty; // 수량
+    private int qty; // 수량
 }

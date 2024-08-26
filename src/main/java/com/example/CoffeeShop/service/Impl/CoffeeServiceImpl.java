@@ -29,37 +29,25 @@ public class CoffeeServiceImpl implements CoffeeService {
     public Orders insertOrder(RequestOrdersDto requestOrdersDto){
         Customer customer = customerRepository.findByCustomerId(requestOrdersDto.getCustomerId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
-        long totPrice = (long) 0;
+        Long totPrice = 0L;
+        Orders orders;
         //주문해놓은 메뉴가 있을 경우
         if(ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).isPresent()){
-            Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
+            orders = ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
             orders.clearOrdersDrinks();
-            for (DrinkQtyDto drinkQty : requestOrdersDto.getDrinksList()) {
-                Drinks drinks = drinksRepository.findByDrinksId(drinkQty.getDrinksId())
-                        .orElseThrow(() -> new IllegalArgumentException("음료가 존재하지 않습니다 : " + drinkQty.getDrinksId()));
-                OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty());
-                ordersDrinksRepository.save(ordersDrinks);
-                orders.addOrdersDrinks(ordersDrinks);
-                totPrice += drinkQty.getQty()*drinksRepository.findByDrinksId(drinkQty.getDrinksId()).get().getPrice();
-                orders.setTotPrice(totPrice);
-            }
         }else{ //주문해놓은 메뉴가 없을 경우
-            Long ordersId;
-            if(ordersRepository.findMaxId()==null){ // orders 테이블에 아무 것도 없을 경우
-                ordersId = (long) 0; // 초기화
-            }else{
-                ordersId = ordersRepository.findMaxId();
-            }
-            Orders ordersSave = ordersRepository.save(requestOrdersDto.toEntity(ordersId+1,customer));
-            for (DrinkQtyDto drinkQty : requestOrdersDto.getDrinksList()) {
-                Drinks drinks = drinksRepository.findByDrinksId(drinkQty.getDrinksId())
-                        .orElseThrow(() -> new IllegalArgumentException("음료가 존재하지 않습니다 : " + drinkQty.getDrinksId()));
-                OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty());
-                ordersDrinksRepository.save(ordersDrinks);
-                ordersSave.addOrdersDrinks(ordersDrinks);
-                totPrice += drinkQty.getQty()*drinksRepository.findByDrinksId(drinkQty.getDrinksId()).get().getPrice();
-                ordersSave.setTotPrice(totPrice);
-            }
+            //아예 orders 에 아무데이터도 없을 경우 1로 초기화
+            Long ordersId = ordersRepository.findMaxId() != null ? ordersRepository.findMaxId() + 1 : 1L;
+            orders = ordersRepository.save(requestOrdersDto.toEntity(ordersId+1,customer));
+        }
+        for (DrinkQtyDto drinkQty : requestOrdersDto.getDrinksList()) {
+            Drinks drinks = drinksRepository.findByDrinksId(drinkQty.getDrinksId())
+                    .orElseThrow(() -> new IllegalArgumentException("음료가 존재하지 않습니다 : " + drinkQty.getDrinksId()));
+            OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty());
+            ordersDrinksRepository.save(ordersDrinks);
+            orders.addOrdersDrinks(ordersDrinks);
+            totPrice += drinkQty.getQty()*drinksRepository.findByDrinksId(drinkQty.getDrinksId()).get().getPrice();
+            orders.setTotPrice(totPrice);
         }
         return ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
     }
@@ -86,7 +74,7 @@ public class CoffeeServiceImpl implements CoffeeService {
         Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(customerId,2)
                 .orElseThrow(()->new IllegalArgumentException("해당 주문 건이 존재하지 않습니다."));
         ResponseOrdersDto responseOrdersDto = ResponseOrdersDto.from(orders);
-        orders.updateAfterTakeout();//상태 '3'으로 변경(배송 완료 상태)
+        orders.updateAfterTakeout();//상태 '3'으로 변경(테이크아웃 완료 상태)
         return responseOrdersDto;
     }
 }

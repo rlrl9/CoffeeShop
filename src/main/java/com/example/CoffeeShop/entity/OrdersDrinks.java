@@ -22,9 +22,9 @@ public class OrdersDrinks {
     private Drinks drinks;
 
     @Column(name = "qty", nullable = false)
-    private Integer quantity;
+    private int quantity;
 
-    public static OrdersDrinks of(Drinks drinks, Integer quantity){
+    public static OrdersDrinks of(Drinks drinks, int quantity){
         OrdersDrinks ordersDrinks = new OrdersDrinks();
         ordersDrinks.drinks = drinks;
         ordersDrinks.quantity = quantity;
