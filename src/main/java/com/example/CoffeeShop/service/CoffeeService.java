@@ -12,7 +12,7 @@ public interface CoffeeService {
     //메뉴 주문
     Orders insertOrder(RequestOrdersDto requestOrdersDto);
     //메뉴 결제
-    ResponsePaymentDto payForOrder(Long customerId);
+    ResponsePaymentDto payForOrder(Long customerId, int paymentType);
     //테이크아웃
     ResponseOrdersDto takeoutMenu(Long customerId);
 }

@@ -36,7 +36,12 @@ public class CoffeeServiceImpl implements CoffeeService {
             Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
             orders.update(requestOrdersDto.getDrinksList());
         }else{ //주문해놓은 메뉴가 없을 경우
-            Long ordersId = ordersRepository.findMaxId();
+            Long ordersId;
+            if(ordersRepository.findMaxId()==null){ // orders 테이블에 아무 것도 없을 경우
+                ordersId = (long) 0; // 초기화
+            }else{
+                ordersId = ordersRepository.findMaxId();
+            }
             ordersRepository.save(requestOrdersDto.toEntity(ordersId+1,customer));
         }
 
@@ -48,10 +53,10 @@ public class CoffeeServiceImpl implements CoffeeService {
      * @return ResponsePaymentDto
      */
     @Override
-    public ResponsePaymentDto payForOrder(Long customerId){
+    public ResponsePaymentDto payForOrder(Long customerId, int paymentType){
         Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(customerId,1)
                 .orElseThrow(()->new IllegalArgumentException("해당 주문 건이 존재하지 않습니다."));
-        Payment payment = paymentRepository.save(Payment.of(orders));
+        Payment payment = paymentRepository.save(Payment.of(orders, paymentType));
         orders.updateAfterPayment();//상태 '2'로 변경(결제 완료 상태)
         return ResponsePaymentDto.from(payment);
     }
