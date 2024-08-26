@@ -28,21 +28,20 @@ public class CoffeeServiceImpl implements CoffeeService {
     public Orders insertOrder(RequestOrdersDto requestOrdersDto){
         Customer customer = customerRepository.findByCustomerId(requestOrdersDto.getCustomerId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
-        if((ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId()).isPresent())
-                &&(ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId()).get().getStatus()==1)){
-            Orders orders = ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId()).get();
+        if(ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).isPresent()){
+            Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
             orders.update(requestOrdersDto.getDrinksList());
         }else{
             Long ordersId = ordersRepository.findMaxId();
             Orders orders = ordersRepository.save(requestOrdersDto.toEntity(ordersId+1,customer));
         }
 
-        return ordersRepository.findByCustomer_CustomerId(requestOrdersDto.getCustomerId()).get();
+        return ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
     }
 
     @Override
     public ResponsePaymentDto payForOrder(Long customerId){
-        Orders orders = ordersRepository.findByCustomer_CustomerId(customerId)
+        Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(customerId,1)
                 .orElseThrow(()->new IllegalArgumentException("해당 주문 건이 존재하지 않습니다."));
         Payment payment = paymentRepository.save(Payment.of(orders));
         orders.updateAfterPayment();
@@ -51,9 +50,9 @@ public class CoffeeServiceImpl implements CoffeeService {
 
     @Override
     public ResponseOrdersDto takeoutMenu(Long customerId){
-        Payment payment = paymentRepository.findByOrders_Customer_CustomerId(customerId)
-                .orElseThrow(()->new IllegalArgumentException("해당 결제 건이 존재하지 않습니다."));
-        Orders orders = ordersRepository.findByCustomer_CustomerId(customerId)
+//        Payment payment = paymentRepository.findByOrders_Customer_CustomerId(customerId)
+//                .orElseThrow(()->new IllegalArgumentException("해당 결제 건이 존재하지 않습니다."));
+        Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(customerId,2)
                 .orElseThrow(()->new IllegalArgumentException("해당 주문 건이 존재하지 않습니다."));
         ResponseOrdersDto responseOrdersDto = ResponseOrdersDto.from(orders);
         orders.updateAfterTakeout();
