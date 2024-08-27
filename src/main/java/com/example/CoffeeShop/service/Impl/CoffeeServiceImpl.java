@@ -5,6 +5,8 @@ import com.example.CoffeeShop.dto.request.RequestOrdersDto;
 import com.example.CoffeeShop.dto.response.ResponseOrdersDto;
 import com.example.CoffeeShop.dto.response.ResponsePaymentDto;
 import com.example.CoffeeShop.entity.*;
+import com.example.CoffeeShop.exception.CoffeeBusinessException;
+import com.example.CoffeeShop.exception.CoffeeExceptionInfo;
 import com.example.CoffeeShop.repository.*;
 import com.example.CoffeeShop.service.CoffeeService;
 import jakarta.transaction.Transactional;
@@ -28,8 +30,8 @@ public class CoffeeServiceImpl implements CoffeeService {
     @Override
     public Orders insertOrder(RequestOrdersDto requestOrdersDto){
         Customer customer = customerRepository.findByCustomerId(requestOrdersDto.getCustomerId())
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
-        Long totPrice = 0L;
+                .orElseThrow(() -> new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_CUSTOMER));
+        long totPrice = 0L;
         Orders orders;
         //주문해놓은 메뉴가 있을 경우
         if(ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).isPresent()){
@@ -42,7 +44,7 @@ public class CoffeeServiceImpl implements CoffeeService {
         }
         for (DrinkQtyDto drinkQty : requestOrdersDto.getDrinksList()) {
             Drinks drinks = drinksRepository.findByDrinksId(drinkQty.getDrinksId())
-                    .orElseThrow(() -> new IllegalArgumentException("음료가 존재하지 않습니다 : " + drinkQty.getDrinksId()));
+                    .orElseThrow(() -> new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_DRINKS));
             OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty());
             ordersDrinksRepository.save(ordersDrinks);
             orders.addOrdersDrinks(ordersDrinks);
@@ -59,7 +61,7 @@ public class CoffeeServiceImpl implements CoffeeService {
     @Override
     public ResponsePaymentDto payForOrder(Long customerId, int paymentType){
         Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(customerId,1)
-                .orElseThrow(()->new IllegalArgumentException("해당 주문 건이 존재하지 않습니다."));
+                .orElseThrow(()->new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_ORDERS));
         Payment payment = paymentRepository.save(Payment.of(orders, paymentType));
         orders.updateAfterPayment();//상태 '2'로 변경(결제 완료 상태)
         return ResponsePaymentDto.from(payment);
@@ -72,7 +74,7 @@ public class CoffeeServiceImpl implements CoffeeService {
     @Override
     public ResponseOrdersDto takeoutMenu(Long customerId){
         Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(customerId,2)
-                .orElseThrow(()->new IllegalArgumentException("해당 주문 건이 존재하지 않습니다."));
+                .orElseThrow(()->new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_TAKEOUT));
         ResponseOrdersDto responseOrdersDto = ResponseOrdersDto.from(orders);
         orders.updateAfterTakeout();//상태 '3'으로 변경(테이크아웃 완료 상태)
         return responseOrdersDto;
