@@ -1,10 +1,9 @@
-package com.example.CoffeeShop.exception;
+package com.example.CoffeeShop.global.exception;
 
-import com.example.CoffeeShop.global.exception.ExceptionInfo;
 import lombok.Getter;
 
 @Getter
-public enum CoffeeExceptionInfo implements ExceptionInfo {
+public enum CoffeeExceptionInfo{
     NOT_EXIST_DRINKS("NOT_EXIST_DRINKS","존재하지 않는 상품입니다."),
     NOT_EXIST_ORDERS("NOT_EXIST_ORDERS","해당 주문 건이 존재하지 않습니다."),
     NOT_EXIST_TAKEOUT("NOT_EXIST_TAKEOUT","테이크 아웃할 상품이 존재하지 않습니다."),

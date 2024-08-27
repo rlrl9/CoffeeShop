@@ -1,6 +1,6 @@
 package com.example.CoffeeShop.global.response;
 
-import com.example.CoffeeShop.global.exception.ExceptionInfo;
+import com.example.CoffeeShop.global.exception.CoffeeExceptionInfo;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,8 +22,8 @@ public class ApiResponse <T>{
         return new ApiResponse<>(null, null, null);
     }
 
-    public static ApiResponse<?> errorResponse(ExceptionInfo exceptionInfo){
-        return new ApiResponse<>(null, exceptionInfo.getCode(), exceptionInfo.getMessage());
+    public static ApiResponse<?> errorResponse(CoffeeExceptionInfo coffeeExceptionInfo){
+        return new ApiResponse<>(null, coffeeExceptionInfo.getCode(), coffeeExceptionInfo.getMessage());
     }
 
     public static ApiResponse<?> errorResponse(String errorMessage){
