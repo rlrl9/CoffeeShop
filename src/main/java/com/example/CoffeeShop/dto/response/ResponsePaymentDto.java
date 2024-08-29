@@ -1,7 +1,9 @@
 package com.example.CoffeeShop.dto.response;
 
+import com.example.CoffeeShop.entity.Orders;
 import com.example.CoffeeShop.entity.OrdersDrinks;
 import com.example.CoffeeShop.entity.Payment;
+import com.example.CoffeeShop.entity.PaymentStatus;
 import lombok.*;
 
 import java.util.List;
@@ -19,19 +21,31 @@ public class ResponsePaymentDto {
 
     private List<OrdersDrinks> drinksMap; // 음료 list
 
-    private boolean status; // 결제 성공/실패 상태 (false: 실패, true: 성공)
+    private String paymentStatus; // 결제 성공/실패 상태
 
-    private int paymentType; // 결제 수단(0: 현금, 1: 카드, 2: 상품권)
+    private String paymentMethod; // 결제 수단(0: 현금, 1: 카드, 2: 상품권)
 
     private Long totPrice; // 총 금액
 
-    public static ResponsePaymentDto from(Payment payment){
+    // 결제 성공시
+    public static ResponsePaymentDto fromPayment(Payment payment, PaymentStatus paymentStatus){
         return ResponsePaymentDto.builder()
                 .customerId(payment.getOrders().getCustomer().getCustomerId())
                 .drinksMap(payment.getOrders().getOrdersDrinksList())
-                .status(payment.isStatus())
-                .paymentType(payment.getPaymentType())
+                .paymentStatus(paymentStatus.getDescription())
+                .paymentMethod(payment.getPaymentMethod().getDescription())
                 .totPrice(payment.getOrders().getTotPrice())
+                .build();
+    }
+
+    //결제 실패시
+    public static ResponsePaymentDto fromOrders(Orders orders, PaymentStatus paymentStatus){
+        return ResponsePaymentDto.builder()
+                .customerId(orders.getCustomer().getCustomerId())
+                .drinksMap(orders.getOrdersDrinksList())
+                .paymentStatus(paymentStatus.getDescription())
+                .paymentMethod(null)
+                .totPrice(0L)
                 .build();
     }
 }

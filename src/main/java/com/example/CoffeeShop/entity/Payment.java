@@ -20,15 +20,12 @@ public class Payment {
     @JoinColumn(name = "orders_id")
     private Orders orders; // 주문 정보
 
-    private boolean status; // 상태 (false: 결제 실패, true: 결제 성공)
+    private PaymentMethod paymentMethod; // 결제 수단(0: 현금, 1: 카드, 2: 상품권)
 
-    private int paymentType; // 결제 수단(0: 현금, 1: 카드, 2: 상품권)
-
-    public static Payment of(Orders orders,int paymentType){
+    public static Payment of(Orders orders,PaymentMethod paymentMethod){
         Payment payment = new Payment();
         payment.orders = orders;
-        payment.status = true;
-        payment.paymentType = paymentType;
+        payment.paymentMethod = paymentMethod;
 
         return payment;
     }
