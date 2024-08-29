@@ -1,5 +1,6 @@
 package com.example.CoffeeShop.dto.response;
 
+import com.example.CoffeeShop.entity.OrderStatus;
 import com.example.CoffeeShop.entity.Orders;
 import com.example.CoffeeShop.entity.OrdersDrinks;
 import lombok.*;
@@ -20,11 +21,11 @@ public class ResponseOrdersDto {
 
     private String statusMessage; // 상태 메세지
 
-    public static ResponseOrdersDto from(Orders orders){
+    public static ResponseOrdersDto from(Orders orders, OrderStatus orderStatus){
         return ResponseOrdersDto.builder()
                 .customerId(orders.getCustomer().getCustomerId())
                 .drinksMap(orders.getOrdersDrinksList())
-                .statusMessage("테이크 아웃 했습니다.")
+                .statusMessage(orderStatus.getDescription())
                 .build();
     }
 }

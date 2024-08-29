@@ -28,55 +28,65 @@ public class CoffeeServiceImpl implements CoffeeService {
      * @return Orders
      */
     @Override
-    public Orders insertOrder(RequestOrdersDto requestOrdersDto){
+    public ResponseOrdersDto registerOrder(RequestOrdersDto requestOrdersDto){
         Customer customer = customerRepository.findByCustomerId(requestOrdersDto.getCustomerId())
                 .orElseThrow(() -> new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_CUSTOMER));
-        long totPrice = 0L;
-        Orders orders;
-        //주문해놓은 메뉴가 있을 경우
-        if(ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).isPresent()){
-            orders = ordersRepository.findByCustomer_CustomerIdAndStatus(requestOrdersDto.getCustomerId(),1).get();
-            orders.clearOrdersDrinks();
-        }else{ //주문해놓은 메뉴가 없을 경우
-            //아예 orders 에 아무데이터도 없을 경우 1로 초기화
-            Long ordersId = ordersRepository.findMaxId() != null ? ordersRepository.findMaxId() + 1 : 1L;
-            orders = ordersRepository.save(requestOrdersDto.toEntity(ordersId,customer));
-        }
+        long totPrice=0L;
+        Orders orders = ordersRepository.save(Orders.of(customer,OrderStatus.WAITING.getValue(), totPrice));
         for (DrinkQtyDto drinkQty : requestOrdersDto.getDrinksList()) {
             Drinks drinks = drinksRepository.findByDrinksId(drinkQty.getDrinksId())
                     .orElseThrow(() -> new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_DRINKS));
-            OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty());
+            OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty(),orders);
             ordersDrinksRepository.save(ordersDrinks);
             orders.addOrdersDrinks(ordersDrinks);
-            totPrice += drinkQty.getQty()*drinksRepository.findByDrinksId(drinkQty.getDrinksId()).get().getPrice();
-            orders.setTotPrice(totPrice);
+            totPrice += drinkQty.getQty() * drinks.getPrice();
         }
-        return orders;
+        orders.updateTotPrice(totPrice);
+        return ResponseOrdersDto.from(orders,OrderStatus.WAITING);
     }
+
     /**
-     * 주문 결제
-     * @param customerId
-     * @return ResponsePaymentDto
-     */
-    @Override
-    public ResponsePaymentDto payForOrder(Long customerId, int paymentType){
-        Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(customerId,1)
-                .orElseThrow(()->new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_ORDERS));
-        Payment payment = paymentRepository.save(Payment.of(orders, paymentType));
-        orders.updateAfterPayment();//상태 '2'로 변경(결제 완료 상태)
-        return ResponsePaymentDto.from(payment);
-    }
-    /**
-     * 결제 메뉴 테이크아웃
-     * @param customerId
-     * @return ResponsePaymentDto
-     */
-    @Override
-    public ResponseOrdersDto takeoutMenu(Long customerId){
-        Orders orders = ordersRepository.findByCustomer_CustomerIdAndStatus(customerId,2)
-                .orElseThrow(()->new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_TAKEOUT));
-        ResponseOrdersDto responseOrdersDto = ResponseOrdersDto.from(orders);
-        orders.updateAfterTakeout();//상태 '3'으로 변경(테이크아웃 완료 상태)
-        return responseOrdersDto;
+         * 주문 결제
+         * @param ordersId
+         * @param paymentMethod
+         * @return ResponsePaymentDto
+         */
+        @Override
+        public ResponsePaymentDto pay(Long ordersId, String paymentMethod){
+            Orders orders = ordersRepository.findByOrdersId(ordersId)
+                    .orElseThrow(() -> new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_ORDERS));
+            if(orders.getStatus() == OrderStatus.CANCELED.getValue()){
+                throw new CoffeeBusinessException(CoffeeExceptionInfo.ALREADY_CANCELED);
+            } else if (orders.getStatus() == OrderStatus.COMPLETED.getValue()) {
+                throw new CoffeeBusinessException(CoffeeExceptionInfo.ALREADY_PAID);
+            } else if (orders.getStatus() == OrderStatus.DELIVERED.getValue()) {
+                throw new CoffeeBusinessException(CoffeeExceptionInfo.ALREADY_DELIVERED);
+            }
+            try {
+                // 결제 처리
+                Payment payment = paymentRepository.save(Payment.of(orders, PaymentMethod.of(paymentMethod)));
+                orders.updateAfterPayment();//상태 '2'로 변경(주문 완료 상태)
+                return ResponsePaymentDto.fromPayment(payment,PaymentStatus.PAID);
+            } catch (Exception e) {
+                return ResponsePaymentDto.fromOrders(orders,PaymentStatus.NOT_PAID);
+            }
+        }
+        /**
+         * 결제 메뉴 테이크아웃
+         * @param ordersId
+         * @return ResponsePaymentDto
+         */
+        @Override
+        public ResponseOrdersDto takeoutMenu(Long ordersId){
+            Orders orders = ordersRepository.findByOrdersId(ordersId)
+                    .orElseThrow(()->new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_TAKEOUT));
+            if(orders.getStatus() == OrderStatus.CANCELED.getValue()||orders.getStatus()==OrderStatus.WAITING.getValue()){
+                throw new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_PAID);
+            } else if (orders.getStatus() == OrderStatus.DELIVERED.getValue()) {
+                throw new CoffeeBusinessException(CoffeeExceptionInfo.ALREADY_DELIVERED);
+            }
+            ResponseOrdersDto responseOrdersDto = ResponseOrdersDto.from(orders, OrderStatus.DELIVERED);
+            orders.updateAfterTakeout();
+            return responseOrdersDto;
     }
 }
