@@ -12,6 +12,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,14 +34,16 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_CUSTOMER));
         long totPrice=0L;
         Orders orders = ordersRepository.save(Orders.of(customer,OrderStatus.WAITING.getValue(), totPrice));
+        List<OrdersDrinks> ordersDrinksList = new ArrayList<>();
         for (DrinkQtyDto drinkQty : requestOrdersDto.getDrinksList()) {
             Drinks drinks = drinksRepository.findByDrinksId(drinkQty.getDrinksId())
                     .orElseThrow(() -> new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_DRINKS));
             OrdersDrinks ordersDrinks = OrdersDrinks.of(drinks, drinkQty.getQty(),orders);
-            ordersDrinksRepository.save(ordersDrinks);
+            ordersDrinksList.add(ordersDrinks);
             orders.addOrdersDrinks(ordersDrinks);
             totPrice += drinkQty.getQty() * drinks.getPrice();
         }
+        ordersDrinksRepository.saveAll(ordersDrinksList);
         orders.updateTotPrice(totPrice);
         return ResponseOrdersDto.from(orders,OrderStatus.WAITING);
     }
