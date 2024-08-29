@@ -15,6 +15,8 @@ import java.util.List;
 @Getter
 @Builder
 public class ResponseOrdersDto {
+    private Long ordersId; // 주문 id
+
     private Long customerId; // 고객 id
 
     private List<OrdersDrinks> drinksMap; // 음료 목록
@@ -23,6 +25,7 @@ public class ResponseOrdersDto {
 
     public static ResponseOrdersDto from(Orders orders, OrderStatus orderStatus){
         return ResponseOrdersDto.builder()
+                .ordersId(orders.getOrdersId())
                 .customerId(orders.getCustomer().getCustomerId())
                 .drinksMap(orders.getOrdersDrinksList())
                 .statusMessage(orderStatus.getDescription())

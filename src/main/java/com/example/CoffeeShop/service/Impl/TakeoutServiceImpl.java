@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class TakeoutServiceImpl implements TakeoutService {
     private final OrdersRepository ordersRepository;
-    private final PaymentRepository paymentRepository;
     /**
      * 결제 메뉴 테이크아웃
      * @param ordersId

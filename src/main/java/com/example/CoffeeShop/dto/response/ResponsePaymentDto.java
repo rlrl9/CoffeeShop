@@ -16,6 +16,7 @@ import java.util.List;
 @Getter
 @Builder
 public class ResponsePaymentDto {
+    private Long ordersId; // 주문 id
 
     private Long customerId; // 고객 id
 
@@ -30,6 +31,7 @@ public class ResponsePaymentDto {
     // 결제 성공시
     public static ResponsePaymentDto fromPayment(Payment payment, PaymentStatus paymentStatus){
         return ResponsePaymentDto.builder()
+                .ordersId(payment.getOrders().getOrdersId())
                 .customerId(payment.getOrders().getCustomer().getCustomerId())
                 .drinksMap(payment.getOrders().getOrdersDrinksList())
                 .paymentStatus(paymentStatus.getDescription())
@@ -41,6 +43,7 @@ public class ResponsePaymentDto {
     //결제 실패시
     public static ResponsePaymentDto fromOrders(Orders orders, PaymentStatus paymentStatus){
         return ResponsePaymentDto.builder()
+                .ordersId(orders.getOrdersId())
                 .customerId(orders.getCustomer().getCustomerId())
                 .drinksMap(orders.getOrdersDrinksList())
                 .paymentStatus(paymentStatus.getDescription())
