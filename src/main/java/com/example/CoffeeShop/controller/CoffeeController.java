@@ -22,19 +22,19 @@ public class CoffeeController {
     private final OrderService orderService;
     private final PaymentService paymentService;
     private final TakeoutService takeoutService;
-    //음료 주문
+    // 음료 주문
     @PostMapping
     public ResponseEntity<ApiResponse<ResponseOrdersDto>> registerOrder(@RequestBody RequestOrdersDto requestOrdersDto) {
         ResponseOrdersDto roDto = orderService.registerOrder(requestOrdersDto);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.successResponse(roDto));
     }
-    //음료 결제 (주문 id, 결제수단으로 결제)
+    // 음료 결제 (주문 id, 결제수단으로 결제)
     @GetMapping
     public ResponseEntity<ApiResponse<ResponsePaymentDto>> pay(@RequestParam(name = "id") Long ordersId, @RequestParam(name = "type") String paymentMethod) {
         ResponsePaymentDto rpDto = paymentService.pay(ordersId, paymentMethod);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.successResponse(rpDto));
     }
-    //음료 테이크아웃 (주문 id로 테이크아웃)
+    // 음료 테이크아웃 (주문 id로 테이크아웃)
     @GetMapping("/takeout")
     public ResponseEntity<ApiResponse<ResponseOrdersDto>> takeoutMenu(@RequestParam(name = "id") Long ordersId) {
         ResponseOrdersDto roDto = takeoutService.takeoutMenu(ordersId);
