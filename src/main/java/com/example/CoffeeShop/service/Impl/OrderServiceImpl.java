@@ -26,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 메뉴 주문
      * @param requestOrdersDto
-     * @return Orders
+     * @return ResponseOrdersDto
      */
     @Override
     public ResponseOrdersDto registerOrder(RequestOrdersDto requestOrdersDto){

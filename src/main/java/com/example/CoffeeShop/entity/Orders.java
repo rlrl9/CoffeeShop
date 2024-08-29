@@ -40,7 +40,7 @@ public class Orders {
 
         return order;
     }
-    //주문의 최종가격 업데이트
+    // 주문의 최종가격 업데이트
     public void updateTotPrice(long price) {
         this.totPrice = price;
     }
@@ -52,7 +52,7 @@ public class Orders {
     public void updateAfterTakeout(){
         this.status = OrderStatus.DELIVERED.getValue();
     }
-    //주문 음료 추가하기
+    // 주문 음료 추가하기
     public void addOrdersDrinks(OrdersDrinks ordersDrinks) {
         this.ordersDrinksList.add(ordersDrinks);
     }

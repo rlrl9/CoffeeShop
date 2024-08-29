@@ -6,7 +6,6 @@ import com.example.CoffeeShop.entity.Orders;
 import com.example.CoffeeShop.global.exception.CoffeeBusinessException;
 import com.example.CoffeeShop.global.exception.CoffeeExceptionInfo;
 import com.example.CoffeeShop.repository.OrdersRepository;
-import com.example.CoffeeShop.repository.PaymentRepository;
 import com.example.CoffeeShop.service.TakeoutService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,7 @@ public class TakeoutServiceImpl implements TakeoutService {
     /**
      * 결제 메뉴 테이크아웃
      * @param ordersId
-     * @return ResponsePaymentDto
+     * @return ResponseOrdersDto
      */
     @Override
     public ResponseOrdersDto takeoutMenu(Long ordersId){
