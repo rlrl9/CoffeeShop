@@ -1,9 +1,6 @@
 package com.example.CoffeeShop.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 /**
@@ -19,9 +16,12 @@ public class Drinks {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long drinksId; // 음료 id
 
+    @Column(name = "drinks_name", nullable = false)
     private String drinksName; // 음료 이름
 
+    @Column(name = "price", nullable = false)
     private Long price; // 음료 가격
 
+    @Column(name = "category_no", nullable = false)
     private int categoryNo; // 카테고리
 }
