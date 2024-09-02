@@ -10,7 +10,6 @@ import lombok.*;
  */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
 @Getter
 @Entity
 public class OrdersDrinks {

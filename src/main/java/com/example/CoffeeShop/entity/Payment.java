@@ -20,13 +20,17 @@ public class Payment {
     @JoinColumn(name = "orders_id", nullable = false)
     private Orders orders; // 주문 정보
 
-    @Column(name = "payment_method", nullable = false)
+    @Column(name = "amount", nullable = false)
+    private Long amount; // 결제 금액
+
+    @Convert(converter = PaymentMethodConverter.class)
     private PaymentMethod paymentMethod; // 결제 수단(0: 현금, 1: 카드, 2: 상품권)
 
-    public static Payment of(Orders orders,PaymentMethod paymentMethod){
+    public static Payment of(Orders orders,Long paymentMethod){
         Payment payment = new Payment();
         payment.orders = orders;
-        payment.paymentMethod = paymentMethod;
+        payment.paymentMethod = PaymentMethod.ofCode(paymentMethod);
+        payment.amount = orders.getTotPrice();
 
         return payment;
     }

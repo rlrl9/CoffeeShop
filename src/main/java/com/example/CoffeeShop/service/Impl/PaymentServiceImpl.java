@@ -24,7 +24,7 @@ public class PaymentServiceImpl implements PaymentService {
      * @return ResponsePaymentDto
      */
     @Override
-    public ResponsePaymentDto pay(Long ordersId, String paymentMethod){
+    public ResponsePaymentDto pay(Long ordersId, Long paymentMethod){
         Orders orders = ordersRepository.findByOrdersId(ordersId)
                 .orElseThrow(() -> new CoffeeBusinessException(CoffeeExceptionInfo.NOT_EXIST_ORDERS));
         if(orders.getStatus() == OrderStatus.CANCELED.getValue()){
@@ -34,13 +34,9 @@ public class PaymentServiceImpl implements PaymentService {
         } else if (orders.getStatus() == OrderStatus.DELIVERED.getValue()) {
             throw new CoffeeBusinessException(CoffeeExceptionInfo.ALREADY_DELIVERED);
         }
-        try {
-            // 결제 처리
-            Payment payment = paymentRepository.save(Payment.of(orders, PaymentMethod.of(paymentMethod)));
-            orders.updateAfterPayment();//상태 '2'로 변경(주문 완료 상태)
-            return ResponsePaymentDto.fromPayment(payment, PaymentStatus.PAID);
-        } catch (Exception e) {
-            return ResponsePaymentDto.fromOrders(orders,PaymentStatus.NOT_PAID);
-        }
+        // 결제 처리
+        Payment payment = paymentRepository.save(Payment.of(orders, paymentMethod));
+        orders.updateAfterPayment();//상태 '2'로 변경(주문 완료 상태)
+        return ResponsePaymentDto.from(payment, PaymentStatus.PAID);
     }
 }
