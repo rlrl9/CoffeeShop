@@ -7,5 +7,5 @@ import com.example.CoffeeShop.dto.response.ResponsePaymentDto;
  */
 public interface PaymentService {
     //메뉴 결제
-    ResponsePaymentDto pay(Long ordersId, String paymentMethod);
+    ResponsePaymentDto pay(Long ordersId, Long paymentMethod);
 }

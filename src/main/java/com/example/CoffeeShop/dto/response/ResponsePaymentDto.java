@@ -26,29 +26,17 @@ public class ResponsePaymentDto {
 
     private String paymentMethod; // 결제 수단(0: 현금, 1: 카드, 2: 상품권)
 
-    private Long totPrice; // 총 금액
+    private Long amount; // 결제 금액
 
     // 결제 성공시
-    public static ResponsePaymentDto fromPayment(Payment payment, PaymentStatus paymentStatus){
+    public static ResponsePaymentDto from(Payment payment, PaymentStatus paymentStatus){
         return ResponsePaymentDto.builder()
                 .ordersId(payment.getOrders().getOrdersId())
                 .customerId(payment.getOrders().getCustomer().getCustomerId())
                 .drinksMap(payment.getOrders().getOrdersDrinksList())
                 .paymentStatus(paymentStatus.getDescription())
                 .paymentMethod(payment.getPaymentMethod().getDescription())
-                .totPrice(payment.getOrders().getTotPrice())
-                .build();
-    }
-
-    //결제 실패시
-    public static ResponsePaymentDto fromOrders(Orders orders, PaymentStatus paymentStatus){
-        return ResponsePaymentDto.builder()
-                .ordersId(orders.getOrdersId())
-                .customerId(orders.getCustomer().getCustomerId())
-                .drinksMap(orders.getOrdersDrinksList())
-                .paymentStatus(paymentStatus.getDescription())
-                .paymentMethod(null)
-                .totPrice(0L)
+                .amount(payment.getAmount())
                 .build();
     }
 }

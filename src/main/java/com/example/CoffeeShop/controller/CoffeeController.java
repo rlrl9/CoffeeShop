@@ -30,7 +30,7 @@ public class CoffeeController {
     }
     // 음료 결제 (주문 id, 결제수단으로 결제)
     @GetMapping
-    public ResponseEntity<ApiResponse<ResponsePaymentDto>> pay(@RequestParam(name = "id") Long ordersId, @RequestParam(name = "type") String paymentMethod) {
+    public ResponseEntity<ApiResponse<ResponsePaymentDto>> pay(@RequestParam(name = "id") Long ordersId, @RequestParam(name = "type") Long paymentMethod) {
         ResponsePaymentDto rpDto = paymentService.pay(ordersId, paymentMethod);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.successResponse(rpDto));
     }
